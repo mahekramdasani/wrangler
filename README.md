@@ -20,7 +20,15 @@ are manually created.
 
 ## New Features
 
+## New Features
+
 More [here](wrangler-docs/upcoming-features.md) on upcoming features.
+
+  * **Byte Size and Time Duration Units Parsers**: The Wrangler library now includes native support for parsing and utilizing byte size and time duration units within recipes. This enhancement allows users to easily handle units like Kilobytes (KB), Megabytes (MB), milliseconds (ms), or seconds (s) without requiring complex multi-step recipes.
+    * **Byte Size Parser**: Supports units such as B, KB, MB, GB, TB (e.g., "10B", "1.5KB", "500MB")
+    * **Time Duration Parser**: Supports units such as ns, us, ms, s, min, h, d (e.g., "100ns", "10ms", "2.5s")
+    * **New Directive**: A new `aggregate-stats` directive demonstrates the usage of these parsers by allowing aggregation operations on columns with byte sizes and time durations
+    * **Note**: Some test failures were encountered during implementation related to transient variables in the aggregation context
 
   * **User Defined Directives, also known as UDD**, allow you to create custom functions to transform records within CDAP DataPrep or a.k.a Wrangler. CDAP comes with a comprehensive library of functions. There are however some omissions, and some specific cases for which UDDs are the solution. Additional information on how you can build your custom directives [here](wrangler-docs/custom-directive.md).
     * Migrating directives from version 1.0 to version 2.0 [here](wrangler-docs/directive-migration.md)
