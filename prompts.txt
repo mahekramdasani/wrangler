@@ -1,0 +1,163 @@
+/*
+ *  Copyright © 2021 Cask Data, Inc.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy of
+ *  the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations under
+ *  the License.
+ */
+
+ "How do I add new lexer tokens for byte size and time duration in ANTLR grammar?"
+"What's the best way to implement BYTE_UNIT and TIME_UNIT fragments in ANTLR grammar?"
+"Show me examples of regex patterns for matching byte sizes like '10KB' or time durations like '150ms'"
+
+
+
+"How to create a ByteSize class that can parse strings like '10KB' and convert to canonical units?"
+"What's the best way to handle different time duration units (ns, us, ms, s, min, h, d) in Java?"
+"How to implement Token subclasses for ByteSize and TimeDuration that work with the Wrangler grammar?"
+"What should the getBytes() method in ByteSize class return to ensure consistent unit conversion?"
+
+
+
+"How to implement an aggregate directive in Wrangler that works with the Store and ExecutorContext?"
+"Show me an example of aggregating values across multiple rows in a Wrangler directive"
+"What's the correct way to update the TokenGroup with new ByteSize and TimeDuration tokens?"
+"How should I handle unit conversion in the aggregate-stats directive for the final output?"
+
+
+"What test cases should I create for the ByteSize and TimeDuration classes?"
+"How to set up a TestingRig for testing the new aggregate-stats directive?"
+"What edge cases should I consider when testing byte size and time duration parsing?"
+"How to debug the 'expected:<2> but was:<null>' error in SetTransientVariableTest?"
+
+
+
+"Why am I getting 'java.lang.AssertionError: expected:<2> but was:<null>' in my tests?"
+"How does the ExecutorContext store transient variables in Wrangler?"
+"What could cause a transient variable to be null when it should have a value of 2?"
+"How to fix issues with transient variable storage in an aggregate directive?"
+
+"[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/TestingPipelineContext.java:[45,13] incompatible types: io.cdap.directives.aggregates.DefaultTransientStore cannot be converted to io.cdap.wrangler.api.TransientStore
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/RecordConvertorTest.java:[93,66] incompatible types: java.util.List<io.cdap.wrangler.api.Row> cannot be converted to java.util.List<Row>
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/RecordConvertorTest.java:[282,33] cannot access Row      
+  class file for Row not found
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/RecordConvertorTest.java:[317,47] incompatible types: io.cdap.wrangler.api.Row cannot be converted to Row
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/RecordConvertorTest.java:[360,76] incompatible types: io.cdap.wrangler.api.Row cannot be converted to Row
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/SchemaConverterTest.java:[78,84] incompatible types: java.util.List<io.cdap.wrangler.api.Row> cannot be converted to java.util.List<Row>
+[INFO] 6 errors
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for Wrangler 4.12.0-SNAPSHOT:
+[INFO]
+[INFO] Wrangler ........................................... SUCCESS [  3.081 s]
+[INFO] Wrangler API ....................................... SUCCESS [  5.480 s]
+[INFO] Wrangler REST Protocol Classes ..................... SUCCESS [  2.699 s]
+[INFO] Wrangler Core ...................................... FAILURE [ 30.784 s]
+[INFO] Wrangler Storage ................................... SKIPPED
+[INFO] Wrangler Service ................................... SKIPPED
+[INFO] Wrangler Testing Framework ......................... SKIPPED
+[INFO] Wrangler Transform ................................. SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  43.273 s
+[INFO] Finished at: 2025-04-13T16:28:42+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile (default-testCompile) on project wrangler-core: Compilation failure: Compilation failure:
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/TestingPipelineContext.java:[45,13] incompatible types: io.cdap.directives.aggregates.DefaultTransientStore cannot be converted to io.cdap.wrangler.api.TransientStore
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/RecordConvertorTest.java:[93,66] incompatible types: java.util.List<io.cdap.wrangler.api.Row> cannot be converted to java.util.List<Row>
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/RecordConvertorTest.java:[282,33] cannot access Row      
+[ERROR]   class file for Row not found
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/RecordConvertorTest.java:[317,47] incompatible types: io.cdap.wrangler.api.Row cannot be converted to Row
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/RecordConvertorTest.java:[360,76] incompatible types: io.cdap.wrangler.api.Row cannot be converted to Row
+[ERROR] /C:/Users/urvas/Asssignment/wrangler/wrangler-core/src/test/java/io/cdap/wrangler/utils/SchemaConverterTest.java:[78,84] incompatible types: java.util.List<io.cdap.wrangler.api.Row> cannot be converted to java.util.List<Row>
+[ERROR] -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR]
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :wrangler-core
+PS C:\Users\urvas\Asssignment\wrangler> "
+
+"ava.lang.NoSuchMethodError: 'void io.cdap.wrangler.expression.ELContext.<init>(io.cdap.wrangler.api.ExecutorContext, io.cdap.wrangler.expression.EL, io.cdap.wrangler.api.Row)'
+        at io.cdap.directives.transformation.ColumnExpression.execute(ColumnExpression.java:99)
+        at io.cdap.directives.transformation.ColumnExpression.execute(ColumnExpression.java:59)
+        at io.cdap.wrangler.executor.RecipePipelineExecutor.execute(RecipePipelineExecutor.java:138)
+        at io.cdap.wrangler.TestingRig.execute(TestingRig.java:92)
+        at io.cdap.wrangler.TestingRig.execute(TestingRig.java:81)
+        at io.cdap.functions.GlobalTest.testPrint(GlobalTest.java:99)
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+        at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+        at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+        at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+        at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+        at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+        at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+        at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+        at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+        at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+        at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+        at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+        at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+        at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+        at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:316)
+        at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:240)
+        at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:214)
+        at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:155)
+        at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+        at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+        at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+        at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) "
+
+"[ERROR] io.cdap.functions.GlobalTest.testFirstNonNullFoundInBetween -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoSuchMethodError: 'void io.cdap.wrangler.expression.ELContext.<init>(io.cdap.wrangler.api.ExecutorContext, io.cdap.wrangler.expression.EL, io.cdap.wrangler.api.Row)'
+        at io.cdap.directives.transformation.ColumnExpression.execute(ColumnExpression.java:99)"
+
+"[INFO] Running io.cdap.directives.aggregates.SetTransientVariableTest
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 1.141 s <<< FAILURE! -- in io.cdap.directives.aggregates.SetTransientVariableTest
+[ERROR] io.cdap.directives.aggregates.SetTransientVariableTest.testSettingOfVariable -- Time elapsed: 1.036 s <<< FAILURE!
+java.lang.AssertionError: expected:<2> but was:<null>
+        at org.junit.Assert.fail(Assert.java:88)
+        at org.junit.Assert.failNotEquals(Assert.java:834)
+        at org.junit.Assert.assertEquals(Assert.java:118)
+        at org.junit.Assert.assertEquals(Assert.java:144)
+        at io.cdap.directives.aggregates.SetTransientVariableTest.testSettingOfVariable(SetTransientVariableTest.java:120)
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+        at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+        at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+        at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+        at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+        at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+        at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+        at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+        at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+        at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+        at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+        at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+        at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+        at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+        at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:316)
+        at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:240)
+        at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:214)
+        at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:155)
+        at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+        at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+        at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+        at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+
+"
