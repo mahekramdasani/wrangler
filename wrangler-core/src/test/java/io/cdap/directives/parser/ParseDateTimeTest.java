@@ -22,6 +22,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,31 +32,39 @@ import java.util.List;
 public class ParseDateTimeTest {
 
   @Test
-  public void testDateTimeFormats() throws Exception {
-    String[] testPatterns = new String[]{"MM/dd/yyyy HH:mm", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss[xxx]",
-      "yyyy-MM-dd'T'HH:mm:ss[xxx]'['VV']'", "yyyyMMdd h:mm a"};
-    String[] colNames = new String[]{"col1", "col2", "col3", "col4", "col5"};
-    String[] dateTimes = new String[]{"03/30/2010 01:05", "2020-01-28T04:50:12", "2011-12-03T10:15:30+01:00",
-      "2011-12-03T10:15:30+01:00[Europe/Paris]", "19901212 10:12 AM"};
-    String[] directives = new String[testPatterns.length];
-    Row row = new Row();
+public void testDateTimeFormats() throws Exception {
+  String[] testPatterns = new String[]{"MM/dd/yyyy HH:mm", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss[xxx]",
+    "yyyy-MM-dd'T'HH:mm:ss[xxx]'['VV']'", "yyyyMMdd h:mm a"};
+  String[] colNames = new String[]{"col1", "col2", "col3", "col4", "col5"};
+  String[] dateTimes = new String[]{"03/30/2010 01:05", "2020-01-28T04:50:12", "2011-12-03T10:15:30+01:00",
+    "2011-12-03T10:15:30+01:00[Europe/Paris]", "19901212 10:12 AM"};
+  String[] directives = new String[testPatterns.length];
+  Row row = new Row();
+  for (int i = 0; i < testPatterns.length; i++) {
+    directives[i] = String
+      .format("%s :%s \"%s\"", ParseDateTime.NAME, colNames[i], testPatterns[i]);
+    row.add(colNames[i], dateTimes[i]);
+  }
+  List<Row> rows = TestingRig.execute(directives, Collections.singletonList(row));
+
+  Assert.assertEquals(1, rows.size());
+
+  for (Row resultRow : rows) {
     for (int i = 0; i < testPatterns.length; i++) {
-      directives[i] = String
-        .format("%s :%s \"%s\"", ParseDateTime.NAME, colNames[i], testPatterns[i]);
-      row.add(colNames[i], dateTimes[i]);
-    }
-    List<Row> rows = TestingRig.execute(directives, Collections.singletonList(row));
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern(testPatterns[i]).withZone(ZoneId.of("UTC"));
+      LocalDateTime expected;
 
-    Assert.assertEquals(1, rows.size());
-
-    for (Row resultRow : rows) {
-      for (int i = 0; i < testPatterns.length; i++) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(testPatterns[i]);
-        Assert.assertEquals(LocalDateTime.parse(dateTimes[i], dateTimeFormatter),
-                            rows.get(0).getValue(colNames[i]));
+      if (dateTimes[i].contains("+") || dateTimes[i].contains("[")) {
+        expected = formatter.parse(dateTimes[i], ZonedDateTime::from).toLocalDateTime();
+      } else {
+        expected = LocalDateTime.parse(dateTimes[i], formatter);
       }
+
+      Assert.assertEquals(expected, rows.get(0).getValue(colNames[i]));
     }
   }
+}
+
 
   @Test
   public void testDateTimeMultipleRows() throws Exception {

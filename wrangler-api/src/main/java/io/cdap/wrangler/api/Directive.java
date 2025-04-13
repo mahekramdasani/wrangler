@@ -115,7 +115,6 @@ public interface Directive extends Executor<List<Row>, List<Row>>, EntityMetrics
    * @see io.cdap.wrangler.api.parser.TokenType
    */
   UsageDefinition define();
-
   /**
    * This method provides a way to emit metrics from the Directive. Metadata about each metric to be emitted can be
    * returned and used in the metrics emission logic elsewhere.

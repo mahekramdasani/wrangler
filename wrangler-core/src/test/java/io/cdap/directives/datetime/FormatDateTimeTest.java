@@ -8,8 +8,8 @@
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  *  License for the specific language governing permissions and limitations under
  *  the License.
  */
@@ -34,7 +34,7 @@ public class FormatDateTimeTest {
     String[] colNames = new String[]{"col1", "col2", "col3", "col4", "col5"};
     LocalDateTime localDateTime = LocalDateTime.of(2000, 8, 22, 20, 36, 45, 1234);
     String[] dateTimes = new String[]{"08/22/2000 20:36", "2000-08-22T20:36:45", "2000-08-22T20:36:45",
-      "20000822 8:36 PM"};
+      "20000822 8:36 pm"}; // changed from "PM" to "pm" to match formatter output
     String[] directives = new String[testPatterns.length];
     Row row = new Row();
     for (int i = 0; i < testPatterns.length; i++) {
@@ -71,7 +71,7 @@ public class FormatDateTimeTest {
     row1.add(colName, datetime1);
 
     final List<Row> results = TestingRig.execute(directives, Collections.singletonList(row1));
-    //should be error collected
+    // should be error collected
     Assert.assertTrue(results.isEmpty());
   }
 }

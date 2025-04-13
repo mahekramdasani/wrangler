@@ -128,7 +128,7 @@ propertyList
  ;
 
 property
- : Identifier '=' ( text | number | bool )
+ : Identifier '=' ( text | number | bool | BYTE_SIZE | TIME_DURATION )
  ;
 
 numberRanges
@@ -148,7 +148,13 @@ value
  | TIME_DURATION
  ;
 
+byteSizeArg
+  : BYTE_SIZE
+  ;
 
+timeDurationArg
+  : TIME_DURATION
+  ;
 ecommand
  : '!' Identifier
  ;
