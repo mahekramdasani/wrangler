@@ -23,15 +23,10 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>wrangler-test</artifactId>
-  <name>Wrangler Testing Framework</name>
+  <artifactId>wrangler-test-utils</artifactId>
+  <name>Wrangler Test Utilities</name>
 
   <dependencies>
-    <dependency>
-      <groupId>io.cdap.wrangler</groupId>
-      <artifactId>wrangler-test-utils</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>io.cdap.cdap</groupId>
       <artifactId>cdap-api</artifactId>
@@ -44,7 +39,11 @@
       <version>${cdap.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
-
-</project>
+</project> 

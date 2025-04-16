@@ -14,7 +14,7 @@
  * the License.
  */
 
-package io.cdap.directives.row;
+package io.cdap.wrangler.executor;
 
 import io.cdap.wrangler.api.Row;
 import io.cdap.wrangler.TestingRig;
@@ -124,5 +124,4 @@ public class AggregateStatsTest {
         row.add(timeColumn, timeValue);
         return row;
     }
-}
-
+} 

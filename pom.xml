@@ -27,12 +27,13 @@
 
   <modules>
     <module>wrangler-api</module>
-    <module>wrangler-core</module>
     <module>wrangler-proto</module>
-    <module>wrangler-service</module>
-    <module>wrangler-storage</module>
+    <module>wrangler-core</module>
+    <module>wrangler-test-utils</module>
     <module>wrangler-test</module>
     <module>wrangler-transform</module>
+    <module>wrangler-storage</module>
+    <module>wrangler-service</module>
   </modules>
 
   <licenses>

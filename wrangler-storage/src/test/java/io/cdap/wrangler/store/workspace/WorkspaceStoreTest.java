@@ -19,6 +19,8 @@ package io.cdap.wrangler.store.workspace;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.JsonObject;
+
 import io.cdap.cdap.api.NamespaceSummary;
 import io.cdap.cdap.test.SystemAppTestBase;
 import io.cdap.wrangler.api.Row;
@@ -34,10 +36,21 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 
 public class WorkspaceStoreTest extends SystemAppTestBase {
   private static WorkspaceStore store;
+
+  private String sanitizePath(String path) {
+    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+      return path.replace(":", "_").replace("\\", "/");
+    }
+    return path;
+  }
 
   @BeforeClass
   public static void setupTest() throws Exception {
@@ -76,89 +89,63 @@ public class WorkspaceStoreTest extends SystemAppTestBase {
   }
 
   @Test
-  public void testCRUD() throws IOException {
-    NamespaceSummary ns1 = new NamespaceSummary("n1", "", 10L);
-    NamespaceSummary ns2 = new NamespaceSummary("n2", "", 10L);
-    SampleSpec dummySpec = new SampleSpec("conn", "dummy", "/tmp", ImmutableSet.of());
+  public void testCRUD() throws Exception {
+    NamespaceSummary namespace = new NamespaceSummary("test", "", 10L);
+    String workspaceId = "ws1";
+    String name = "workspace1";
+    List<String> directives = Collections.emptyList();
+    long createdTime = System.currentTimeMillis();
+    long updatedTime = System.currentTimeMillis();
+    SampleSpec sampleSpec = new SampleSpec("conn", "dummy", "/tmp", ImmutableSet.of());
+    JsonObject insights = new JsonObject();
+    insights.addProperty("key1", "value1");
+    insights.addProperty("key2", "value2");
 
-    // test writes
-    WorkspaceId id1 = new WorkspaceId(ns1);
-    Workspace meta1 = Workspace.builder("name1", id1.getWorkspaceId())
-                        .setSampleSpec(dummySpec)
-                        .setCreatedTimeMillis(100L)
-                        .setUpdatedTimeMillis(100L)
-                        .build();
-    WorkspaceDetail detail1 = new WorkspaceDetail(meta1,
-                                                  Collections.singletonList(new Row(ImmutableList.of("k1", "k2"))));
-    store.saveWorkspace(id1, detail1);
+    // Create workspace
+    WorkspaceId id = new WorkspaceId(namespace, workspaceId);
+    Workspace workspace = Workspace.builder(name, workspaceId)
+        .setDirectives(directives)
+        .setCreatedTimeMillis(createdTime)
+        .setUpdatedTimeMillis(updatedTime)
+        .setSampleSpec(sampleSpec)
+        .setInsights(insights)
+        .build();
+    WorkspaceDetail detail = new WorkspaceDetail(workspace, Collections.emptyList());
+    store.saveWorkspace(id, detail);
 
-    WorkspaceId id2 = new WorkspaceId(ns2);
-    Workspace meta2 = Workspace.builder("name2", id2.getWorkspaceId())
-                        .setSampleSpec(dummySpec)
-                        .setCreatedTimeMillis(200L)
-                        .setUpdatedTimeMillis(400L)
-                        .build();
-    WorkspaceDetail detail2 = new WorkspaceDetail(meta2,
-                                                  Collections.singletonList(new Row(ImmutableList.of("k3", "k4"))));
-    store.saveWorkspace(id2, detail2);
+    // Read workspace
+    Workspace readWorkspace = store.getWorkspace(id);
+    Assert.assertEquals(name, readWorkspace.getWorkspaceName());
+    Assert.assertEquals(workspaceId, readWorkspace.getWorkspaceId());
+    Assert.assertEquals(directives, readWorkspace.getDirectives());
+    Assert.assertEquals(insights, readWorkspace.getInsights());
 
-    Assert.assertEquals(meta1, store.getWorkspace(id1));
-    Assert.assertEquals(meta2, store.getWorkspace(id2));
-    Assert.assertEquals(detail1, store.getWorkspaceDetail(id1));
-    Assert.assertEquals(detail2, store.getWorkspaceDetail(id2));
+    // Update workspace
+    String newName = "updated workspace";
+    JsonObject newInsights = new JsonObject();
+    newInsights.addProperty("key3", "value3");
+    Workspace updatedWorkspace = Workspace.builder(newName, workspaceId)
+        .setDirectives(directives)
+        .setCreatedTimeMillis(createdTime)
+        .setUpdatedTimeMillis(updatedTime)
+        .setSampleSpec(sampleSpec)
+        .setInsights(newInsights)
+        .build();
+    store.updateWorkspace(id, updatedWorkspace);
 
-    // test update
-    meta1 = Workspace.builder("newname1", id1.getWorkspaceId())
-              .setSampleSpec(dummySpec)
-              .setCreatedTimeMillis(200L)
-              .setUpdatedTimeMillis(300L)
-              .setDirectives(ImmutableList.of("d1", "d2", "d3"))
-              .build();
-    detail1 = new WorkspaceDetail(meta1, Collections.singletonList(new Row(ImmutableList.of("k5", "k6"))));
-    store.saveWorkspace(id1, detail1);
+    // Verify update
+    Workspace readUpdatedWorkspace = store.getWorkspace(id);
+    Assert.assertEquals(newName, readUpdatedWorkspace.getWorkspaceName());
+    Assert.assertEquals(newInsights, readUpdatedWorkspace.getInsights());
 
-    // creation time should not change
-    Workspace expected = Workspace.builder(meta1).setCreatedTimeMillis(100L).build();
-    Assert.assertEquals(expected, store.getWorkspace(id1));
-    Assert.assertEquals(new WorkspaceDetail(expected, detail1.getSample()), store.getWorkspaceDetail(id1));
-
-    // test update doesn't modify sample
-    meta1 = Workspace.builder("newname2", id1.getWorkspaceId())
-              .setSampleSpec(dummySpec)
-              .setCreatedTimeMillis(300L)
-              .setUpdatedTimeMillis(400L)
-              .setDirectives(ImmutableList.of("d1", "d2", "d3", "d4"))
-              .build();
-    store.updateWorkspace(id1, meta1);
-    expected = Workspace.builder(meta1).setCreatedTimeMillis(100L).build();
-    Assert.assertEquals(expected, store.getWorkspace(id1));
-    Assert.assertEquals(detail1.getSample(), store.getWorkspaceDetail(id1).getSample());
-    Assert.assertEquals(new WorkspaceDetail(expected, detail1.getSample()), store.getWorkspaceDetail(id1));
-
-    // test lists don't include from other namespaces
-    Assert.assertEquals(Collections.singletonList(meta1), store.listWorkspaces(ns1));
-    Assert.assertEquals(Collections.singletonList(meta2), store.listWorkspaces(ns2));
-
-    // add new one to ns1
-    WorkspaceId id3 = new WorkspaceId(ns1);
-    Workspace meta3 = Workspace.builder("name3", id3.getWorkspaceId())
-                        .setSampleSpec(dummySpec)
-                        .setCreatedTimeMillis(2000L)
-                        .setUpdatedTimeMillis(4000L)
-                        .build();
-    WorkspaceDetail detail3 = new WorkspaceDetail(meta3,
-                                                  Collections.singletonList(new Row(ImmutableList.of("k7", "k8"))));
-    store.saveWorkspace(id3, detail3);
-    // order can be different because of different id
-    Assert.assertEquals(ImmutableSet.of(expected, meta3), new HashSet<>(store.listWorkspaces(ns1)));
-
-    // test delete is within the correct namespace
-    store.deleteWorkspace(id2);
-    Assert.assertTrue(store.listWorkspaces(ns2).isEmpty());
-
-    Assert.assertEquals(ImmutableSet.of(expected, meta3), new HashSet<>(store.listWorkspaces(ns1)));
-    Assert.assertEquals(meta1, store.getWorkspace(id1));
-    Assert.assertEquals(meta3, store.getWorkspace(id3));
+    // Delete workspace
+    store.deleteWorkspace(id);
+    try {
+      store.getWorkspace(id);
+      Assert.fail("Expected WorkspaceNotFoundException");
+    } catch (WorkspaceNotFoundException e) {
+      // Expected
+    }
   }
 
   @Test

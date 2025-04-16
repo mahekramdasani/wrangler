@@ -25,6 +25,7 @@ import io.cdap.wrangler.api.ExecutorContext;
 import io.cdap.wrangler.api.Row;
 
 import io.cdap.wrangler.api.annotations.Categories;
+import io.cdap.wrangler.api.annotations.PublicEvolving;
 
 import io.cdap.wrangler.api.parser.ByteSize;
 import io.cdap.wrangler.api.parser.ColumnName;
@@ -33,10 +34,9 @@ import io.cdap.wrangler.api.parser.TimeDuration;
 import io.cdap.wrangler.api.parser.TokenType;
 import io.cdap.wrangler.api.parser.UsageDefinition;
 
-
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 
 /**
  * A directive to aggregate ByteSize and TimeDuration columns.
@@ -45,6 +45,7 @@ import java.util.List;
 @Name("aggregate-stats")
 @Description("Aggregate size and time values using byte/time duration parsers")
 @Categories(categories = { "transform", "aggregate" })
+@PublicEvolving
 public class AggregateStats implements Directive {
   private String sizeInputCol;
   private String timeInputCol;
@@ -52,17 +53,17 @@ public class AggregateStats implements Directive {
   private String timeOutputCol;
 
   private long totalBytes = 0;
-  private long totalMillis = 0;
+  private long totalNanoseconds = 0;
+  private int rowCount = 0;
 
   @Override
   public UsageDefinition define() {
     UsageDefinition.Builder builder = UsageDefinition.builder("aggregate-stats");
-builder.define("sizeInputCol", TokenType.COLUMN_NAME);
-builder.define("timeInputCol", TokenType.COLUMN_NAME);
-builder.define("sizeOutputCol", TokenType.IDENTIFIER);
-builder.define("timeOutputCol", TokenType.IDENTIFIER);
-return builder.build();
-
+    builder.define("sizeInputCol", TokenType.COLUMN_NAME);
+    builder.define("timeInputCol", TokenType.COLUMN_NAME);
+    builder.define("sizeOutputCol", TokenType.IDENTIFIER);
+    builder.define("timeOutputCol", TokenType.IDENTIFIER);
+    return builder.build();
   }
 
   @Override
@@ -75,31 +76,43 @@ return builder.build();
 
   @Override
   public List<Row> execute(List<Row> rows, ExecutorContext context) throws DirectiveExecutionException {
-    long totalBytes = 0;
-    long totalMillis = 0;
-  
     for (Row row : rows) {
-      Object sizeObj = row.getValue(sizeInputCol);
-      Object timeObj = row.getValue(timeInputCol);
-  
-      long sizeVal = ((ByteSize) sizeObj).value();
-      long timeVal = ((TimeDuration) timeObj).value();
-  
-      totalBytes += sizeVal;
-      totalMillis += timeVal;
+      // Process byte size
+      Object sizeValue = row.getValue(sizeInputCol);
+      if (sizeValue instanceof String) {
+        ByteSize byteSize = new ByteSize((String) sizeValue);
+        totalBytes += ((Number) byteSize.value()).longValue();
+      }
+
+      // Process time duration
+      Object timeValue = row.getValue(timeInputCol);
+      if (timeValue instanceof String) {
+        TimeDuration timeDuration = new TimeDuration((String) timeValue);
+        totalNanoseconds += ((Number) timeDuration.value()).longValue();
+      }
+
+      rowCount++;
     }
-  
-    // ✅ Emit only one row with totals converted
-    Row result = new Row();
-    result.add(sizeOutputCol, totalBytes / (1024.0 * 1024.0)); // bytes to MB
-    result.add(timeOutputCol, totalMillis / 1000.0);           // ms to sec
-    return Collections.singletonList(result);
+
+    // Create a single row with the aggregated results
+    List<Row> result = new ArrayList<>();
+    Row aggregatedRow = new Row();
+    
+    // Convert total bytes to MB
+    double totalSizeMB = totalBytes / (1024.0 * 1024.0);
+    aggregatedRow.add(sizeOutputCol, totalSizeMB);
+    
+    // Convert total nanoseconds to seconds
+    double totalTimeSec = totalNanoseconds / 1_000_000_000.0;
+    aggregatedRow.add(timeOutputCol, totalTimeSec);
+    
+    result.add(aggregatedRow);
+    return result;
   }
   
-
-
   @Override
   public void destroy() {
     // No cleanup needed for this directive
   }
 }
+

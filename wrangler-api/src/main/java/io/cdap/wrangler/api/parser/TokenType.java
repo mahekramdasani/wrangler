@@ -76,16 +76,13 @@ public enum TokenType implements Serializable {
    * Represents the enumerated type for the object of {@code ByteSize} type.
    * This type is associated with the token that expresses a size in bytes, such as 1KB or 100MB.
    */
-
   BYTE_SIZE,
 
   /**
    * Represents the enumerated type for the object of {@code TimeDuration} type.
    * This type is associated with the token that expresses a duration of time, such as 10s or 5m.
    */
-
   TIME_DURATION,
-
 
   /**
    * Represents the enumerated type for the object of {@code Bool} type.

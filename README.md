@@ -224,3 +224,61 @@ Cask is a trademark of Cask Data, Inc. All rights reserved.
 
 Apache, Apache HBase, and HBase are trademarks of The Apache Software Foundation. Used with
 permission. No endorsement by The Apache Software Foundation is implied by the use of these marks.
+
+## Byte Size and Time Duration Parsers
+
+The Wrangler library now includes built-in support for parsing and handling byte size and time duration units. This makes it easier to work with data that contains size or time measurements.
+
+### Byte Size Parser
+
+The byte size parser supports the following units:
+- B (bytes)
+- KB (kilobytes)
+- MB (megabytes)
+- GB (gigabytes)
+- TB (terabytes)
+
+Example usage:
+```
+"1MB"  // 1 megabyte
+"1024KB"  // 1 megabyte
+"1.5GB"  // 1.5 gigabytes
+```
+
+### Time Duration Parser
+
+The time duration parser supports the following units:
+- ns (nanoseconds)
+- ms (milliseconds)
+- s or sec (seconds)
+- m or min (minutes)
+- h (hours)
+
+Example usage:
+```
+"100ms"  // 100 milliseconds
+"1.5s"  // 1.5 seconds
+"2min"  // 2 minutes
+```
+
+### Aggregate Stats Directive
+
+The `aggregate-stats` directive allows you to aggregate byte size and time duration values from multiple rows. It calculates the total size and total time duration.
+
+Usage:
+```
+aggregate-stats :size_column :time_column :total_size_column :total_time_column
+```
+
+Example:
+```
+aggregate-stats :data_transfer_size :response_time total_size_mb total_time_sec
+```
+
+This will:
+1. Read byte size values from the `data_transfer_size` column
+2. Read time duration values from the `response_time` column
+3. Calculate the total size in megabytes and store it in `total_size_mb`
+4. Calculate the total time in seconds and store it in `total_time_sec`
+
+The directive automatically handles different units and converts them to the appropriate output units (MB for size, seconds for time).
